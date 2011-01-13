@@ -9,14 +9,15 @@ Fires a [Publisher](http://atomicobject.github.com/publisher/) event whenever th
 
 ### How do I use it?
 
-class Foo
-  include Kvo
-  kvo_attr_accessor :bar, :baz
-end
-    
-f = Foo.new
-f.when :bar_changed do |oldVal, newVal|
-end
+    class Foo
+      include Kvo
+      kvo_attr_accessor :bar, :baz
+    end
+        
+    f = Foo.new
+    f.when :bar_changed do |oldVal, newVal|
+      puts "bar was changed from #{oldVal} to #{newVal}"
+    end
 
 Authors
 =======
