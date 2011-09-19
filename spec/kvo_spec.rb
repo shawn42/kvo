@@ -31,10 +31,46 @@ describe 'kvo' do
     @target.bar = :yar
     @target.instance_variable_get("@bar").should be_nil
   end
-end
 
+  describe "inheritance" do
+    before do
+      @target = SubFoo.new
+
+      @fired = nil
+      @target.when :bar_changed do |old, new|
+        @fired = {:old => old, :new => new}
+      end
+      @target.when :qux_changed do |old, new|
+        @qux_fired = {:old => old, :new => new}
+      end
+    end
+
+    it 'inherits kvo from parent' do
+      @target.bar = :old
+      old_val = @target.bar
+      @target.bar = :yar
+      @fired.should_not be_nil
+      @fired[:old].should == old_val
+      @fired[:new].should == :yar
+    end
+
+    it 'can add more kvo fields to its parents fields' do
+      @target.qux = :old
+
+      old_val = @target.qux
+      @target.qux = :yar
+      @qux_fired.should_not be_nil
+      @qux_fired[:old].should == old_val
+      @qux_fired[:new].should == :yar
+    end
+  end
+end
 
 class Foo
   include Kvo
   kvo_attr_accessor :bar, :baz
+end
+
+class SubFoo < Foo
+  kvo_attr_accessor :qux
 end
