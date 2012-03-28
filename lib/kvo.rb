@@ -4,7 +4,7 @@ module Kvo
     def kvo_attr_accessor(*kvo_symbols)
       kvo_symbols.each do |kvo|
         class_eval <<-METHODS
-          can_fire :#{kvo}_changed
+          can_fire :#{kvo}_changed unless published_events == :any_event_is_ok
           def #{kvo}
             @kvo_#{kvo}
           end
