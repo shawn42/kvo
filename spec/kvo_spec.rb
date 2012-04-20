@@ -32,6 +32,13 @@ describe 'kvo' do
     @target.instance_variable_get("@bar").should be_nil
   end
 
+  it 'can call back a block of arity 0' do
+    @baz_fired = nil
+    @target.when :baz_changed do @baz_fired = true end
+    @target.baz = :something
+    @baz_fired.should be
+  end
+
   describe "inheritance" do
     before do
       @target = SubFoo.new
