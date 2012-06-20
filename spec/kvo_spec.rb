@@ -1,6 +1,6 @@
 require File.join(File.dirname(__FILE__),'helper')
 
-describe 'kvo' do
+describe '.kvo_attr_accessor' do
   before do
     @target = Foo.new
     @target.bar = :old
@@ -39,6 +39,14 @@ describe 'kvo' do
     @baz_fired.should be
   end
 
+  it 'raises an error if attr setter is already defined' do
+    lambda{ ThingOne.kvo_attr_accessor :one }.should raise_exception(RuntimeError, /one= already exists/)
+  end
+
+  it 'raises an error if attr getter is already defined' do
+    lambda{ ThingTwo.kvo_attr_accessor :two }.should raise_exception(RuntimeError, /two already exists/)
+  end
+
   describe "inheritance" do
     before do
       @target = SubFoo.new
@@ -73,6 +81,44 @@ describe 'kvo' do
   end
 end
 
+describe '#kvo_bind_attr' do
+  let(:peter_pan) { 
+    peter = PeterPan.new 
+    peter.location = "OVER THERE"
+    peter.flying = false
+    peter
+  }
+  let(:shadow) { Shadow.new }
+
+  it 'modifies attr when bound objects attr changes' do
+    peter_pan.kvo_bind_attr :location, shadow
+    peter_pan.location = "NEVERLAND"
+
+    shadow.location.should == "NEVERLAND"
+  end
+
+  it 'can use a different method name on target' do
+    peter_pan.kvo_bind_attr :location, shadow, to: :place
+
+    peter_pan.location = "NEVERLAND"
+
+    shadow.location.should be_nil
+    shadow.place.should == "NEVERLAND"
+  end
+
+  it 'can transform new value with a block' do
+    peter_pan.kvo_bind_attr :location, shadow do |new_value|
+      new_value.downcase
+    end
+    peter_pan.location = "NEVERLAND"
+    shadow.location.should == "neverland"
+  end
+
+  it 'can bind to non-kvo attrs (by making them kvo)' do
+    lambda{ peter_pan.kvo_bind_attr :flying, shadow}.should raise_exception(RuntimeError, /flying is not a kvo attr/)
+  end
+end
+
 class Foo
   include Kvo
   kvo_attr_accessor :bar, :baz
@@ -81,3 +127,26 @@ end
 class SubFoo < Foo
   kvo_attr_accessor :qux
 end
+
+class PeterPan
+  include Kvo
+  kvo_attr_accessor :location
+  attr_accessor :flying
+end
+
+class Shadow
+  attr_accessor :location, :place, :flying
+end
+
+class ThingOne
+  include Kvo
+  attr_writer :one
+end
+
+class ThingTwo
+  include Kvo
+  attr_reader :two
+end
+
+
+
