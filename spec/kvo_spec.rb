@@ -39,14 +39,6 @@ describe '.kvo_attr_accessor' do
     @baz_fired.should be
   end
 
-  it 'raises an error if attr setter is already defined' do
-    lambda{ ThingOne.kvo_attr_accessor :one }.should raise_exception(RuntimeError, /one= already exists/)
-  end
-
-  it 'raises an error if attr getter is already defined' do
-    lambda{ ThingTwo.kvo_attr_accessor :two }.should raise_exception(RuntimeError, /two already exists/)
-  end
-
   describe "inheritance" do
     before do
       @target = SubFoo.new

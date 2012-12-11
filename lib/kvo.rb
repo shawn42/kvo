@@ -4,9 +4,6 @@ module Kvo
     def kvo_attr_accessor(*kvo_symbols)
       kvo_symbols.each do |kvo|
 
-        raise "the method #{kvo} already exists" if self.instance_methods.include? kvo
-        raise "the method #{kvo}= already exists" if self.instance_methods.include? "#{kvo}=".to_sym
-
         class_eval <<-METHODS
           can_fire :#{kvo}_changed unless published_events == :any_event_is_ok
           def #{kvo}
