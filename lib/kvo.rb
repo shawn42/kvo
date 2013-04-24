@@ -11,8 +11,10 @@ module Kvo
           end
           def #{kvo}=(new_val)
             old = @kvo_#{kvo}
-            @kvo_#{kvo}=new_val
-            fire :#{kvo}_changed, old, new_val
+            unless old == new_val
+              @kvo_#{kvo}=new_val
+              fire :#{kvo}_changed, old, new_val
+            end
           end
         METHODS
       end

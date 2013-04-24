@@ -11,12 +11,9 @@ describe '.kvo_attr_accessor' do
     end
   end
 
-  it 'notifies on setting of same value' do
-    old_val = @target.bar
-    @target.bar = old_val
-    @fired.should_not be_nil
-    @fired[:old].should == old_val
-    @fired[:new].should == old_val
+  it 'does NOT notify on setting of same value' do
+    @target.bar = @target.bar
+    @fired.should be_nil
   end
 
   it 'notifies on setting of different value' do
